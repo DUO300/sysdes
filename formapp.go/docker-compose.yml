@@ -1,0 +1,13 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    ## uncomment the line below if you want to start the program automatically
+#    command: go run main.go
+    volumes:
+      - .:/go/src/app
+    ports:
+      - "8000:8000"

@@ -1,0 +1,8 @@
+# Golang
+go.sum
+
+# log
+*.log
+
+# Binaries
+httpserver.go
