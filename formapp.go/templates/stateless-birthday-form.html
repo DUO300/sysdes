@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Birthday form | foamapp.go</title>
+    </head>
+    <body>
+        <form action="/stateless/birthday" method="post">
+            <label>生年月日: </label>
+            <input type="date" name="birthday" value="2011-10-22"></input>
+            <input type="hidden" name="name" value="{{ .Name }}">
+            <br><input type="submit" value="next"></input>
+            <input type="submit" value="back" formaction="/stateless/start" formmethod="post"></input>
+        </form>
+    </body>
+</html>
