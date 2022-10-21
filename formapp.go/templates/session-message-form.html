@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Message form | foamapp.go</title>
+    </head>
+    <body>
+        <form action="/session/message" method="post">
+            <label>メッセージ: </label><br>
+            <textarea name="message" value="message"></textarea>
+            <br><input type="submit" value="next"></input>
+            <input type="submit" value="back" formaction="/session/name" formmethod="post"></input>
+        </form>
+    </body>
+</html>

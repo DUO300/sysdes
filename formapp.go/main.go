@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"formapp.go/service"
 	"formapp.go/service/stateless"
+	"formapp.go/service/session"
 )
 
 // config
@@ -26,11 +27,19 @@ func main() {
 	engine.GET("/bye", service.ByeHandler)
 	engine.GET("/hello.jp", service.HellojpHandler)
 
+	// stateless routing
 	engine.GET("/stateless/start", stateless.Start)
     engine.POST("/stateless/start", stateless.NameForm)
     engine.POST("/stateless/name", stateless.BirthdayForm)
     engine.POST("/stateless/birthday", stateless.MessageForm)
     engine.POST("/stateless/message", stateless.Result)
+
+	// session routing
+	engine.GET("/session/start", session.Start)
+    engine.POST("/session/start", session.NameForm)
+    engine.POST("/session/name", session.BirthdayForm)
+    engine.POST("/session/birthday", session.MessageForm)
+    engine.POST("/session/message", session.SubmitForm)
 
 	// start server
 	engine.Run(fmt.Sprintf(":%d", port))

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Message form | foamapp.go</title>
+    </head>
+    <body>
+        <form action="/session/start" method="get">
+            名前: {{ .Name }}
+            <br>
+            生年月日: {{ .Birthday }}
+            <br>
+            メッセージ
+            <br>
+            <textarea disabled>{{ .Message }}</textarea>
+            <br><input type="submit" value="submit"></input>
+            <input type="submit" value="back" formaction="/session/birthday" formmethod="post"></input>
+        </form>
+    </body>
+</html>
