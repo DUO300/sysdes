@@ -1,4 +1,4 @@
-INSERT INTO `tasks` (`title`) VALUES ("sample-task-01");
+INSERT INTO `tasks` (`title`, `text`) VALUES ("sample-task-01", "this is a description of sample-task-01");
 INSERT INTO `tasks` (`title`) VALUES ("sample-task-02");
 INSERT INTO `tasks` (`title`) VALUES ("sample-task-03");
 INSERT INTO `tasks` (`title`) VALUES ("sample-task-04");
