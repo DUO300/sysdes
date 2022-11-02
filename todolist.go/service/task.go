@@ -11,23 +11,41 @@ import (
 
 // TaskList renders list of tasks in DB
 func TaskList(ctx *gin.Context) {
-	// Get DB connection
-	db, err := database.GetConnection()
-	if err != nil {
-		Error(http.StatusInternalServerError, err.Error())(ctx)
-		return
+    // Get DB connection
+    db, err := database.GetConnection()
+    if err != nil {
+        Error(http.StatusInternalServerError, err.Error())(ctx)
+        return
+    }
+ 
+    // Get query parameter
+    kw := ctx.Query("kw")
+	status := ctx.Query("status")
+	var statusstr string
+	switch status {
+	case "complete":
+		statusstr = "1"
+	case "incomplete":
+		statusstr = "0"
+	default:
+		statusstr = "%"
 	}
-
-	// Get tasks in DB
-	var tasks []database.Task
-	err = db.Select(&tasks, "SELECT * FROM tasks") // Use DB#Select for multiple entries
-	if err != nil {
-		Error(http.StatusInternalServerError, err.Error())(ctx)
-		return
-	}
-
-	// Render tasks
-	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks})
+ 
+    // Get tasks in DB
+    var tasks []database.Task
+    switch {
+    case kw != "":
+        err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ?", "%" + kw + "%", statusstr)
+    default:
+        err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ?", statusstr)
+    }
+    if err != nil {
+        Error(http.StatusInternalServerError, err.Error())(ctx)
+        return
+    }
+ 
+    // Render tasks
+    ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks, "Kw": kw, "Status": status})
 }
 
 // ShowTask renders a task with given ID
