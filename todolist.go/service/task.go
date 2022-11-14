@@ -33,9 +33,11 @@ func TaskList(ctx *gin.Context) {
 	statusstr := ctx.Query("status")
 	kw_h := ctx.Query("kw_h")
 	status_h := ctx.Query("status_h")
+	sort_h := ctx.Query("sort_h")
 	pagenum_str := ctx.Query("pagenum")
 	search := ctx.Query("search")
 	movpage := ctx.Query("movpage")
+	sort_query := ctx.Query("sort")
 
 	// Get current page number
 	var pagenum int
@@ -54,6 +56,9 @@ func TaskList(ctx *gin.Context) {
 	if search == "" {
 		kw = kw_h
 		statusstr = status_h
+		sort_query = sort_h
+	} else {
+		pagenum = 1
 	}
 	if movpage == "<" {
 		pagenum--
@@ -72,13 +77,17 @@ func TaskList(ctx *gin.Context) {
 		status = "%"
 	}
 
+	if sort_query == "" {
+		sort_query = "id ASC"
+	}
+
 	// Get tasks in DB
 	var tasks []database.Task
 	switch {
 	case kw != "":
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ?", "%"+kw+"%", status)
+		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ? ORDER BY " + sort_query, "%"+kw+"%", status)
 	default:
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ?", status)
+		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ? ORDER BY " + sort_query, status)
 	}
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
@@ -92,7 +101,7 @@ func TaskList(ctx *gin.Context) {
 	}
 
 	// Render tasks
-	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum-1)*PAGESIZE : min(pagenum*PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage})
+	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum-1)*PAGESIZE : min(pagenum*PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage, "Sort": sort_query})
 }
 
 // ShowTask renders a task with given ID
