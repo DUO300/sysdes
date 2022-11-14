@@ -9,8 +9,18 @@ import (
 	database "todolist.go/db"
 )
 
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // TaskList renders list of tasks in DB
 func TaskList(ctx *gin.Context) {
+	// define pagesize
+	const PAGESIZE = 5
+
 	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
@@ -20,32 +30,69 @@ func TaskList(ctx *gin.Context) {
 
 	// Get query parameter
 	kw := ctx.Query("kw")
-	status := ctx.Query("status")
-	var statusstr string
-	switch status {
+	statusstr := ctx.Query("status")
+	kw_h := ctx.Query("kw_h")
+	status_h := ctx.Query("status_h")
+	pagenum_str := ctx.Query("pagenum")
+	search := ctx.Query("search")
+	movpage := ctx.Query("movpage")
+
+	// Get current page number
+	var pagenum int
+	if pagenum_str == "" {
+		pagenum = 1
+	} else {
+		pagenum, err = strconv.Atoi(pagenum_str)
+		if err != nil {
+			Error(http.StatusInternalServerError, err.Error())(ctx)
+			return
+		}
+	}
+
+	// If "search" button is not pressed, then replace the search query to the old one
+	// to avoid searching with different query when "<" or ">" is pressed
+	if search == "" {
+		kw = kw_h
+		statusstr = status_h
+	}
+	if movpage == "<" {
+		pagenum--
+	} else if movpage == ">" {
+		pagenum++
+	}
+
+	// Change statusstr (string) to 0, 1 or % (= 0 or 1)
+	var status string
+	switch statusstr {
 	case "complete":
-		statusstr = "1"
+		status = "1"
 	case "incomplete":
-		statusstr = "0"
+		status = "0"
 	default:
-		statusstr = "%"
+		status = "%"
 	}
 
 	// Get tasks in DB
 	var tasks []database.Task
 	switch {
 	case kw != "":
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ?", "%"+kw+"%", statusstr)
+		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ?", "%"+kw+"%", status)
 	default:
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ?", statusstr)
+		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ?", status)
 	}
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 
+	// Check whether the page is the last or not to disable the ">" button
+	is_lastpage := false
+	if pagenum * PAGESIZE >= len(tasks) {
+		is_lastpage = true
+	}
+
 	// Render tasks
-	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks, "Kw": kw, "Status": status})
+	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum - 1) * PAGESIZE : min(pagenum * PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage})
 }
 
 // ShowTask renders a task with given ID
@@ -73,7 +120,7 @@ func ShowTask(ctx *gin.Context) {
 	}
 
 	// Render task
-	// ctx.String(http.StatusOK, task.Title)  // Modify it!!
+	// ctx.String(http.StatusOK, task.Title)
 	ctx.HTML(http.StatusOK, "task.html", task)
 }
 
