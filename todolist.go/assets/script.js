@@ -10,3 +10,15 @@ const confirm_update = (id) => {
         document.getElementById(`update-form`).submit();
     }
 }
+
+const past_deadline_font_color = (date_str_all) => {
+    var date_str = date_str_all.slice(0, 19);
+    var date = new Date(Date.parse(date_str));
+    var now = new Date(Date.now());
+    if (date.getTime() < now.getTime()) {
+        return `'#ff0000'`;
+    }
+    else {
+        return `'#00ff00'`;
+    }
+}
