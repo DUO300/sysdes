@@ -9,8 +9,18 @@ import (
 	database "todolist.go/db"
 )
 
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // TaskList renders list of tasks in DB
 func TaskList(ctx *gin.Context) {
+	// define pagesize
+	const PAGESIZE = 5
+
 	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
@@ -21,6 +31,33 @@ func TaskList(ctx *gin.Context) {
 	// Get query parameter
 	kw := ctx.Query("kw")
 	status := ctx.Query("status")
+	kw_h := ctx.Query("kw_h")
+	status_h := ctx.Query("status_h")
+	pagenum_str := ctx.Query("pagenum")
+	search := ctx.Query("search")
+	movpage := ctx.Query("movpage")
+
+	var pagenum int
+	if pagenum_str == "" {
+		pagenum = 1
+	} else {
+		pagenum, err = strconv.Atoi(pagenum_str)
+		if err != nil {
+			Error(http.StatusInternalServerError, err.Error())(ctx)
+			return
+		}
+	}
+
+	if search == "" {
+		kw = kw_h
+		status = status_h
+	}
+	if movpage == "<" {
+		pagenum--
+	} else if movpage == ">" {
+		pagenum++
+	}
+
 	var statusstr string
 	switch status {
 	case "complete":
@@ -44,8 +81,13 @@ func TaskList(ctx *gin.Context) {
 		return
 	}
 
+	is_lastpage := false
+	if pagenum * PAGESIZE >= len(tasks) {
+		is_lastpage = true
+	}
+
 	// Render tasks
-	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks, "Kw": kw, "Status": status})
+	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum - 1) * PAGESIZE : min(pagenum * PAGESIZE, len(tasks))], "Kw": kw, "Status": status, "Pagenum": pagenum, "Is_lastpage": is_lastpage})
 }
 
 // ShowTask renders a task with given ID
