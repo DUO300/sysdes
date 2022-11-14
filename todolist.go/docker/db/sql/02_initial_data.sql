@@ -3,3 +3,4 @@ INSERT INTO `tasks` (`title`) VALUES ("sample-task-02");
 INSERT INTO `tasks` (`title`) VALUES ("sample-task-03");
 INSERT INTO `tasks` (`title`) VALUES ("sample-task-04");
 INSERT INTO `tasks` (`title`, `is_done`) VALUES ("sample-task-05", true);
+INSERT INTO `tasks` (`title`, `deadline`) VALUES ("final-report", "2022-11-29 23:59:00");
