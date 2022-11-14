@@ -1,11 +1,17 @@
 {{ template "header" . }}
 <h1>Task {{ .Task.ID }}: edit</h1>
 <form id="update-form" action="/task/edit/{{ .Task.ID }}" method="POST">
-    <label>Title</label><input type="text" name="title" value="{{ .Task.Title }}" required>
+    <label>Title</label>
+    <br>
+    <input type="text" name="title" value="{{ .Task.Title }}" required>
     <br>
     <input type="radio" name="is_done" value="t" {{ if .Task.IsDone }}checked{{ end }}><label>完了</label>
     <input type="radio" name="is_done" value="f" {{ if not .Task.IsDone }}checked{{ end }}><label>未完了</label>
-    </br>
+    <br>
+    <label>Deadline</label>
+    <br>
+    <input type="datetime-local" name="deadline" {{if eq .Task.Deadline.Valid true}} value="{{ .Deadline }}" {{end}}>
+    <br>
     <label>Description</label>
     <br>
     <textarea name="description">{{ .Task.Description }}</textarea>

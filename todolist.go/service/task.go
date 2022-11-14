@@ -87,12 +87,12 @@ func TaskList(ctx *gin.Context) {
 
 	// Check whether the page is the last or not to disable the ">" button
 	is_lastpage := false
-	if pagenum * PAGESIZE >= len(tasks) {
+	if pagenum*PAGESIZE >= len(tasks) {
 		is_lastpage = true
 	}
 
 	// Render tasks
-	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum - 1) * PAGESIZE : min(pagenum * PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage})
+	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum-1)*PAGESIZE : min(pagenum*PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage})
 }
 
 // ShowTask renders a task with given ID
@@ -120,7 +120,6 @@ func ShowTask(ctx *gin.Context) {
 	}
 
 	// Render task
-	// ctx.String(http.StatusOK, task.Title)
 	ctx.HTML(http.StatusOK, "task.html", task)
 }
 
@@ -135,33 +134,42 @@ func RegisterTask(ctx *gin.Context) {
 		Error(http.StatusBadRequest, "No title is given")(ctx)
 		return
 	}
+	// Get task description
 	description, exist := ctx.GetPostForm("description")
 	if !exist {
 		Error(http.StatusBadRequest, "No description is given")(ctx)
 		return
 	}
+	// Get task deadline
+	deadline, exist := ctx.GetPostForm("deadline")
+	if !exist {
+		Error(http.StatusBadRequest, "No deadline is given")(ctx)
+		return
+	}
+
 	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
+
 	// Create new data with given title and description on DB
-	result, err := db.Exec("INSERT INTO tasks (title, description) VALUES (?, ?)", title, description)
+	result, err := db.Exec("INSERT INTO tasks (title, description, deadline) VALUES (?, ?, ?)", title, description, deadline)
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 	// Render status
-	path := "/list" // デフォルトではタスク一覧ページへ戻る
+	path := "/list" // return to task list page as default
 	if id, err := result.LastInsertId(); err == nil {
-		path = fmt.Sprintf("/task/%d", id) // 正常にIDを取得できた場合は /task/<id> へ戻る
+		path = fmt.Sprintf("/task/%d", id) // return to /task/<id> if it get id correctly
 	}
 	ctx.Redirect(http.StatusFound, path)
 }
 
 func EditTaskForm(ctx *gin.Context) {
-	// ID の取得
+	// Get task id
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		Error(http.StatusBadRequest, err.Error())(ctx)
@@ -180,9 +188,16 @@ func EditTaskForm(ctx *gin.Context) {
 		Error(http.StatusBadRequest, err.Error())(ctx)
 		return
 	}
+
+	// Change the format of datetime so html can read the value correctly
+	var date_str_formated string
+	if task.Deadline.Valid {
+		date_str_formated = task.Deadline.Time.Format("2006-01-02T15:04:05")
+	}
+
 	// Render edit form
 	ctx.HTML(http.StatusOK, "form_edit_task.html",
-		gin.H{"Title": fmt.Sprintf("Edit task %d", task.ID), "Task": task})
+		gin.H{"Title": fmt.Sprintf("Edit task %d", task.ID), "Task": task, "Deadline": date_str_formated})
 }
 
 func UpdateTask(ctx *gin.Context) {
@@ -204,6 +219,12 @@ func UpdateTask(ctx *gin.Context) {
 		Error(http.StatusBadRequest, "No description is given")(ctx)
 		return
 	}
+	// Get task deadline
+	deadline, exist := ctx.GetPostForm("deadline")
+	if !exist {
+		Error(http.StatusBadRequest, "No deadline is given")(ctx)
+		return
+	}
 	// Get task is_done
 	is_done, exist := ctx.GetPostForm("is_done")
 	if !exist {
@@ -223,7 +244,7 @@ func UpdateTask(ctx *gin.Context) {
 		return
 	}
 	// Update DB
-	_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=? WHERE id=?", title, is_done_bool, description, id)
+	_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=?, deadline=? WHERE id=?", title, is_done_bool, description, deadline, id)
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
@@ -234,7 +255,7 @@ func UpdateTask(ctx *gin.Context) {
 }
 
 func DeleteTask(ctx *gin.Context) {
-	// ID の取得
+	// Get task id
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		Error(http.StatusBadRequest, err.Error())(ctx)
