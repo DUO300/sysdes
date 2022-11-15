@@ -1,10 +1,12 @@
 package service
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	database "todolist.go/db"
 )
@@ -20,6 +22,8 @@ func min(a int, b int) int {
 func TaskList(ctx *gin.Context) {
 	// define pagesize
 	const PAGESIZE = 5
+
+	userID := sessions.Default(ctx).Get("user")
 
 	// Get DB connection
 	db, err := database.GetConnection()
@@ -83,11 +87,12 @@ func TaskList(ctx *gin.Context) {
 
 	// Get tasks in DB
 	var tasks []database.Task
+	query := "SELECT id, title, created_at, is_done, deadline FROM tasks INNER JOIN ownership ON task_id = id WHERE user_id = ?"
 	switch {
 	case kw != "":
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query, "%"+kw+"%", status)
+		err = db.Select(&tasks, query+" AND title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query, userID, "%"+kw+"%", status)
 	default:
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ? ORDER BY "+sort_query, status)
+		err = db.Select(&tasks, query+" AND is_done LIKE ? ORDER BY "+sort_query, userID, status)
 	}
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
@@ -164,11 +169,21 @@ func RegisterTask(ctx *gin.Context) {
 	}
 
 	// Create new data with given title and description on DB
-	result, err := db.Exec("INSERT INTO tasks (title, description, deadline) VALUES (?, ?, ?)", title, description, deadline)
-	if err != nil {
-		Error(http.StatusInternalServerError, err.Error())(ctx)
-		return
+	var result sql.Result
+	if len(deadline) == 0 {
+		result, err = db.Exec("INSERT INTO tasks (title, description) VALUES (?, ?)", title, description)
+		if err != nil {
+			Error(http.StatusInternalServerError, err.Error())(ctx)
+			return
+		}
+	} else {
+		result, err = db.Exec("INSERT INTO tasks (title, description, deadline) VALUES (?, ?, ?)", title, description, deadline)
+		if err != nil {
+			Error(http.StatusInternalServerError, err.Error())(ctx)
+			return
+		}
 	}
+
 	// Render status
 	path := "/list" // return to task list page as default
 	if id, err := result.LastInsertId(); err == nil {
@@ -284,4 +299,35 @@ func DeleteTask(ctx *gin.Context) {
 	}
 	// Redirect to /list
 	ctx.Redirect(http.StatusFound, "/list")
+}
+
+func TaskCheck(ctx *gin.Context) {
+	userID := sessions.Default(ctx).Get("user")
+
+	// Get DB connection
+	db, err := database.GetConnection()
+	if err != nil {
+		Error(http.StatusInternalServerError, err.Error())(ctx)
+		return
+	}
+
+	// parse ID given as a parameter
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		Error(http.StatusBadRequest, err.Error())(ctx)
+		return
+	}
+
+	// Get a task with given ID
+	var task database.Task
+	err = db.Get(&task, "SELECT * FROM tasks WHERE id=?", id)
+	err_empty := db.Get(&task, "SELECT id, title, created_at, is_done, deadline FROM tasks INNER JOIN ownership ON task_id=id WHERE user_id=? AND id=?", userID, id) // Use DB#Get for one entry
+	if err != nil {
+		Error(http.StatusBadRequest, err.Error())(ctx)
+		ctx.Abort()
+	} else if err_empty != nil {
+		Error(http.StatusForbidden, "Access Forbidden")(ctx)
+		ctx.Abort()
+	}
+	ctx.Next()
 }
