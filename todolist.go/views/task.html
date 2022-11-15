@@ -3,6 +3,8 @@
 <dl>
     <dt>ID</dt>
     <dd>{{ .ID }}</dd>
+    <dt>Deadline</dt>
+    <dd>{{if eq .Deadline.Valid false}} - {{else}} {{ .Deadline.Time }} {{end}}</dd>
     <dt>Created at</dt>
     <dd>{{ .CreatedAt }}</dd>
     <dt>Status</dt>
