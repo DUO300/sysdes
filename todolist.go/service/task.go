@@ -85,9 +85,9 @@ func TaskList(ctx *gin.Context) {
 	var tasks []database.Task
 	switch {
 	case kw != "":
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ? ORDER BY " + sort_query, "%"+kw+"%", status)
+		err = db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query, "%"+kw+"%", status)
 	default:
-		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ? ORDER BY " + sort_query, status)
+		err = db.Select(&tasks, "SELECT * FROM tasks WHERE is_done LIKE ? ORDER BY "+sort_query, status)
 	}
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
