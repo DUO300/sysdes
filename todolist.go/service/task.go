@@ -142,6 +142,9 @@ func NewTaskForm(ctx *gin.Context) {
 }
 
 func RegisterTask(ctx *gin.Context) {
+
+	userID := sessions.Default(ctx).Get("user")
+
 	// Get task title
 	title, exist := ctx.GetPostForm("title")
 	if !exist {
@@ -168,28 +171,38 @@ func RegisterTask(ctx *gin.Context) {
 		return
 	}
 
-	// Create new data with given title and description on DB
+	// Create new data with given title and description (and deadline) on DB
+	tx := db.MustBegin()
 	var result sql.Result
 	if len(deadline) == 0 {
-		result, err = db.Exec("INSERT INTO tasks (title, description) VALUES (?, ?)", title, description)
+		result, err = tx.Exec("INSERT INTO tasks (title, description) VALUES (?, ?)", title, description)
 		if err != nil {
+			tx.Rollback()
 			Error(http.StatusInternalServerError, err.Error())(ctx)
 			return
 		}
 	} else {
-		result, err = db.Exec("INSERT INTO tasks (title, description, deadline) VALUES (?, ?, ?)", title, description, deadline)
+		result, err = tx.Exec("INSERT INTO tasks (title, description, deadline) VALUES (?, ?, ?)", title, description, deadline)
 		if err != nil {
+			tx.Rollback()
 			Error(http.StatusInternalServerError, err.Error())(ctx)
 			return
 		}
 	}
-
-	// Render status
-	path := "/list" // return to task list page as default
-	if id, err := result.LastInsertId(); err == nil {
-		path = fmt.Sprintf("/task/%d", id) // return to /task/<id> if it get id correctly
+	taskID, err := result.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		Error(http.StatusInternalServerError, err.Error())(ctx)
+		return
 	}
-	ctx.Redirect(http.StatusFound, path)
+	_, err = tx.Exec("INSERT INTO ownership (user_id, task_id) VALUES (?, ?)", userID, taskID)
+	if err != nil {
+		tx.Rollback()
+		Error(http.StatusInternalServerError, err.Error())(ctx)
+		return
+	}
+	tx.Commit()
+	ctx.Redirect(http.StatusFound, fmt.Sprintf("/task/%d", taskID))
 }
 
 func EditTaskForm(ctx *gin.Context) {

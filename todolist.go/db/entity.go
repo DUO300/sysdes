@@ -22,4 +22,5 @@ type User struct {
 	Password  []byte    `db:"password"`
 	UpdatedAt time.Time `db:"updated_at"`
 	CreatedAt time.Time `db:"created_at"`
+	Valid     bool      `db:"valid"`
 }

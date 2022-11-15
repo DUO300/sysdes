@@ -16,10 +16,11 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
     `id`         bigint(20) NOT NULL AUTO_INCREMENT,
-    `name`       varchar(50) NOT NULL UNIQUE,
+    `name`       varchar(50) NOT NULL,
     `password`   binary(32) NOT NULL,
     `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `valid`      boolean NOT NULL DEFAULT b'1',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
 
