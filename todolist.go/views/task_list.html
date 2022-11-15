@@ -38,7 +38,7 @@
         <tr align="center">
             <td><a href="/task/{{ $task.ID }}">{{ $task.ID }}</a></td>
             <td>{{ $task.Title }}</td>
-            <td>{{if eq $task.Deadline.Valid false}} - {{else}} {{ $task.Deadline.Time }} {{end}}</td>
+            <td id={{$task.ID}}>{{if eq $task.Deadline.Valid false}} <font> - </font> {{else}} <script> past_deadline_font_color("{{ $task.Deadline.Time }}", "{{ $task.ID }}") </script> {{ $task.Deadline.Time }} </font> {{end}}</td>
             <td>{{ if $task.IsDone }}済{{ end }}</td>
             <td>{{ $task.CreatedAt }}</td>
         </tr>
