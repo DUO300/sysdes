@@ -219,7 +219,7 @@ func EditTaskForm(ctx *gin.Context) {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
-	
+
 	// Get target task
 	var task database.Task
 	err = db.Get(&task, "SELECT * FROM tasks WHERE id=?", id)
