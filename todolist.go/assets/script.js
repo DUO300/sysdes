@@ -23,14 +23,24 @@ const confirm_update_user = () => {
     }
 }
 
-const past_deadline_font_color = (date_str_all, id) => {
-    var date_str = date_str_all.slice(0, 19);
-    var date = new Date(Date.parse(date_str));
-    var now = new Date(Date.now());
-    if (date.getTime() > now.getTime()) {
-        document.getElementById(id).style.color = "black";
+const parse_go_formatted_date = (date_str_go_formatted) => {
+    if (date_str_go_formatted.length < 19) {
+        console.error("Unknown date format");
+        return -1;
     }
-    else {
-        document.getElementById(id).style.color = "red";
+    const date_str = date_str_go_formatted.substring(0, 10) + "T" + date_str_go_formatted.substring(11, 19);
+    return new Date(Date.parse(date_str));
+}
+
+const past_deadline_bgcolor = (date_str_all, id, status) => {
+    const date = parse_go_formatted_date(date_str_all);
+    const now = new Date(Date.now());
+    if (date.getTime() < now.getTime()) {
+        if (status == "false") {
+            document.getElementById(id).style.backgroundColor = "#ffcccc";
+        }
+        else {
+            document.getElementById(id).style.backgroundColor = "#99ffcc";
+        }
     }
 }
