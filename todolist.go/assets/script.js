@@ -7,7 +7,7 @@ const confirm_delete = (id) => {
 
 const confirm_delete_user = (name) => {
     if (window.confirm(`アカウント(アカウント名: ${name}) を削除します．よろしいですか？`)) {
-        location.href = `/user/delete`;
+        location.href = `/delete_user`;
     }
 }
 

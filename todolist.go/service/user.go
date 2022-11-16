@@ -24,10 +24,11 @@ func hash(pw string) []byte {
 }
 
 func RegisterUser(ctx *gin.Context) {
-	// フォームデータの受け取り
+	// Get form data
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
 	password2 := ctx.PostForm("password2")
+	// check each data
 	switch {
 	case username == "":
 		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Usernane is not provided", "Username": username})
@@ -43,7 +44,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// パスワードのチェック
+	// check password
 	if len(password) <= 4 {
 		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password too short. Password length must be at least 5", "Username": username})
 		return
@@ -53,14 +54,14 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// DB 接続
+	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 
-	// 重複チェック
+	// Check duplication
 	var duplicate int
 	err = db.Get(&duplicate, "SELECT COUNT(*) FROM users WHERE name=? AND valid=1", username)
 	if err != nil {
@@ -72,17 +73,17 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// DB への保存
+	// Create new data with given username and password on DB
 	result, err := db.Exec("INSERT INTO users(name, password) VALUES (?, ?)", username, hash(password))
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 
-	// 保存状態の確認
+	// Check DB
 	id, _ := result.LastInsertId()
 	var user database.User
-	err = db.Get(&user, "SELECT id, name, password, updated_at FROM users WHERE id = ? AND valid=1", id)
+	err = db.Get(&user, "SELECT id, name, password FROM users WHERE id = ? AND valid=1", id)
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
@@ -98,16 +99,18 @@ func LoginForm(ctx *gin.Context) {
 const userkey = "user"
 
 func Login(ctx *gin.Context) {
+	// Get form data
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
 
+	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 
-	// ユーザの取得
+	// Get user from DB (valid only)
 	var user database.User
 	err = db.Get(&user, "SELECT id, name, password FROM users WHERE name = ? AND valid=1", username)
 	if err != nil {
@@ -115,13 +118,13 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	// パスワードの照合
+	// Check password
 	if hex.EncodeToString(user.Password) != hex.EncodeToString(hash(password)) {
 		ctx.HTML(http.StatusBadRequest, "login.html", gin.H{"Title": "Login", "Username": username, "Error": "Incorrect password"})
 		return
 	}
 
-	// セッションの保存
+	// Save session
 	session := sessions.Default(ctx)
 	session.Set(userkey, user.ID)
 	session.Save()
@@ -135,12 +138,14 @@ func LoginCheck(ctx *gin.Context) {
 		ctx.Abort()
 	} else {
 		userID := sessions.Default(ctx).Get("user")
+
 		// Get DB connection
 		db, err := database.GetConnection()
 		if err != nil {
 			Error(http.StatusInternalServerError, err.Error())(ctx)
 			ctx.Abort()
 		}
+
 		// Get target user
 		var user database.User
 		err = db.Get(&user, "SELECT * FROM users WHERE id=? AND valid=1", userID)
@@ -161,8 +166,7 @@ func Logout(ctx *gin.Context) {
 }
 
 func DeleteUser(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	userID := session.Get("user")
+	userID := sessions.Default(ctx).Get("user")
 
 	// Get DB connection
 	db, err := database.GetConnection()
@@ -177,6 +181,7 @@ func DeleteUser(ctx *gin.Context) {
 		return
 	}
 
+	session := sessions.Default(ctx)
 	session.Clear()
 	session.Options(sessions.Options{MaxAge: -1})
 	session.Save()

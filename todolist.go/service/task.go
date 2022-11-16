@@ -281,7 +281,12 @@ func UpdateTask(ctx *gin.Context) {
 		return
 	}
 	// Update DB
-	_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=?, deadline=? WHERE id=?", title, is_done_bool, description, deadline, id)
+	if len(deadline) == 0 {
+		_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=? WHERE id=?", title, is_done_bool, description, id)
+
+	} else {
+		_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=?, deadline=? WHERE id=?", title, is_done_bool, description, deadline, id)
+	}
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
