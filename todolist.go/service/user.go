@@ -28,7 +28,8 @@ func RegisterUser(ctx *gin.Context) {
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
 	password2 := ctx.PostForm("password2")
-	// check each data
+
+	// Check each data
 	switch {
 	case username == "":
 		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Usernane is not provided", "Username": username})
@@ -44,7 +45,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	// check password
+	// Check password
 	if len(password) <= 4 {
 		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password too short. Password length must be at least 5", "Username": username})
 		return
@@ -158,6 +159,7 @@ func LoginCheck(ctx *gin.Context) {
 }
 
 func Logout(ctx *gin.Context) {
+	// Clear session data
 	session := sessions.Default(ctx)
 	session.Clear()
 	session.Options(sessions.Options{MaxAge: -1})
@@ -181,6 +183,7 @@ func DeleteUser(ctx *gin.Context) {
 		return
 	}
 
+	// Clear session data
 	session := sessions.Default(ctx)
 	session.Clear()
 	session.Options(sessions.Options{MaxAge: -1})
@@ -189,7 +192,6 @@ func DeleteUser(ctx *gin.Context) {
 }
 
 func ShowUser(ctx *gin.Context) {
-
 	userID := sessions.Default(ctx).Get("user")
 
 	// Get DB connection
@@ -207,7 +209,7 @@ func ShowUser(ctx *gin.Context) {
 		return
 	}
 
-	// Render task
+	// Render user information
 	ctx.HTML(http.StatusOK, "user.html", gin.H{"Title": "User", "User": user})
 }
 
@@ -239,11 +241,13 @@ func UpdateUser(ctx *gin.Context) {
 
 	userID := sessions.Default(ctx).Get("user")
 
-	// フォームデータの受け取り
+	// Get form data
 	username := ctx.PostForm("username")
 	password_old := ctx.PostForm("password_old")
 	password_new1 := ctx.PostForm("password_new1")
 	password_new2 := ctx.PostForm("password_new2")
+
+	// Check each data
 	switch {
 	case username == "":
 		ctx.HTML(http.StatusBadRequest, "form_edit_user.html", gin.H{"Title": "Edit user", "Error": "Usernane is not provided", "Username": username})
@@ -269,7 +273,7 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	// ユーザの取得
+	// Get user from DB (valid only)
 	var user database.User
 	err = db.Get(&user, "SELECT id, name, password FROM users WHERE id=? AND valid=1", userID)
 	if err != nil {
@@ -277,13 +281,13 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	// パスワードの照合
+	// Check old password
 	if hex.EncodeToString(user.Password) != hex.EncodeToString(hash(password_old)) {
 		ctx.HTML(http.StatusBadRequest, "form_edit_user.html", gin.H{"Title": "Edit user", "Error": "Incorrect old password", "Username": username})
 		return
 	}
 
-	// パスワードのチェック
+	// Check new password
 	if len(password_new1) <= 4 {
 		ctx.HTML(http.StatusBadRequest, "form_edit_user.html", gin.H{"Title": "Edit user", "Error": "New password too short. Password length must be at least 5", "Username": username, "Password_old": password_old})
 		return
@@ -293,7 +297,7 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	// 重複チェック
+	// Check duplication
 	var duplicate int
 	err = db.Get(&duplicate, "SELECT COUNT(*) FROM users WHERE name=? AND valid=1 AND id!=?", username, userID)
 	if err != nil {
@@ -312,5 +316,5 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 	// Render status
-	ctx.Redirect(http.StatusFound, "/user")
+	ctx.Redirect(http.StatusFound, "/user/info")
 }

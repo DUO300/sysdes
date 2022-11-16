@@ -20,7 +20,7 @@ func min(a int, b int) int {
 
 // TaskList renders list of tasks in DB
 func TaskList(ctx *gin.Context) {
-	// define pagesize
+	// Define pagesize
 	const PAGESIZE = 5
 
 	userID := sessions.Default(ctx).Get("user")
@@ -212,12 +212,14 @@ func EditTaskForm(ctx *gin.Context) {
 		Error(http.StatusBadRequest, err.Error())(ctx)
 		return
 	}
+
 	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
+	
 	// Get target task
 	var task database.Task
 	err = db.Get(&task, "SELECT * FROM tasks WHERE id=?", id)
@@ -280,6 +282,7 @@ func UpdateTask(ctx *gin.Context) {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
+
 	// Update DB
 	if len(deadline) == 0 {
 		_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=? WHERE id=?", title, is_done_bool, description, id)
@@ -303,18 +306,21 @@ func DeleteTask(ctx *gin.Context) {
 		Error(http.StatusBadRequest, err.Error())(ctx)
 		return
 	}
+
 	// Get DB connection
 	db, err := database.GetConnection()
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
+
 	// Delete the task from DB
 	_, err = db.Exec("DELETE FROM tasks WHERE id=?", id)
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
+
 	// Redirect to /list
 	ctx.Redirect(http.StatusFound, "/list")
 }

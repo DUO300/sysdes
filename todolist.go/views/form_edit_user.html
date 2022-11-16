@@ -10,17 +10,17 @@
     <br>
     <label>現在のパスワードを入力</label>
     <br>
-    <input type="text" name="password_old" value="{{ .Password_old }}" required>
+    <input type="password" name="password_old" value="{{ .Password_old }}" required>
     <br>
     <label>新しいパスワードを入力</label>
     <br>
-    <input type="text" name="password_new1" value="{{ .Password_new1 }}" required>
+    <input type="password" name="password_new1" value="{{ .Password_new1 }}" required>
     <br>
     <label>もう一度新しいパスワードを入力</label>
     <br>
-    <input type="text" name="password_new2" value="{{ .Password_new2 }}" required>
+    <input type="password" name="password_new2" value="{{ .Password_new2 }}" required>
     <br>
-    <button type="button" onclick="confirm_update_user({{ .Username }})">更新</button>
+    <button type="button" onclick="confirm_update_user()">更新</button>
     <a href="/user/info"><button type="button">戻る</button></a>
 </form>
 {{ template "footer" }}

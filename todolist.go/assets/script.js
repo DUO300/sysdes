@@ -17,15 +17,13 @@ const confirm_update = (id) => {
     }
 }
 
-const confirm_update_user = (name) => {
+const confirm_update_user = () => {
     if (window.confirm(`アカウント情報を更新します．よろしいですか？`)) {
         document.getElementById(`update-form`).submit();
     }
 }
 
 const past_deadline_font_color = (date_str_all, id) => {
-    console.log(typeof date_str_all);
-    console.log(date_str_all);
     var date_str = date_str_all.slice(0, 19);
     var date = new Date(Date.parse(date_str));
     var now = new Date(Date.now());
