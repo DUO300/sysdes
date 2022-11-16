@@ -1,0 +1,26 @@
+{{ template "header" . }}
+<h1>Account: edit</h1>
+{{ if .Error }}
+<p><font color="#FF0000">{{ .Error }}</font><p>
+{{ end }}
+<form id="update-form" action="/user/edit" method="POST">
+    <label>アカウント名</label>
+    <br>
+    <input type="text" name="username" value="{{ .Username }}" required>
+    <br>
+    <label>現在のパスワードを入力</label>
+    <br>
+    <input type="password" name="password_old" value="{{ .Password_old }}" required>
+    <br>
+    <label>新しいパスワードを入力</label>
+    <br>
+    <input type="password" name="password_new1" value="{{ .Password_new1 }}" required>
+    <br>
+    <label>もう一度新しいパスワードを入力</label>
+    <br>
+    <input type="password" name="password_new2" value="{{ .Password_new2 }}" required>
+    <br>
+    <button type="button" onclick="confirm_update_user()">更新</button>
+    <a href="/user/info"><button type="button">戻る</button></a>
+</form>
+{{ template "footer" }}
