@@ -32,7 +32,7 @@ func RegisterUser(ctx *gin.Context) {
 	// Check each data
 	switch {
 	case username == "":
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Usernane is not provided", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Username is not provided", "Username": username})
 		return
 	case password == "":
 		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password is not provided", "Password": password})
@@ -250,7 +250,7 @@ func UpdateUser(ctx *gin.Context) {
 	// Check each data
 	switch {
 	case username == "":
-		ctx.HTML(http.StatusBadRequest, "form_edit_user.html", gin.H{"Title": "Edit user", "Error": "Usernane is not provided", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "form_edit_user.html", gin.H{"Title": "Edit user", "Error": "Username is not provided", "Username": username})
 		return
 	case password_old == "":
 		ctx.HTML(http.StatusBadRequest, "form_edit_user.html", gin.H{"Title": "Edit user", "Error": "Old password is not provided", "Username": username, "Password_old": password_old})
