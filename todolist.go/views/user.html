@@ -1,9 +1,9 @@
 {{ template "header" . }}
 <h1>アカウント名: {{ .User.Name }}</h1>
 <dl>
-    <dt>Created At</dt>
+    <dt>作成日時</dt>
     <dd>{{ .User.CreatedAt }}</dd>
-    <dt>Updated at</dt>
+    <dt>最終更新日時</dt>
     <dd>{{ .User.UpdatedAt }}</dd>
 </dl>
 <a href="/list"><button type="button">リストへ戻る</button></a>

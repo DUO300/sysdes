@@ -72,7 +72,7 @@ func main() {
 	engine.GET("/logout", service.LoginCheck, service.Logout)
 
 	// Delete user account
-	engine.GET("/delete_user", service.LoginCheck, service.DeleteUser)
+	engine.GET("/user/delete", service.LoginCheck, service.DeleteUser)
 
 	// Show user info
 	engine.GET("/user/info", service.LoginCheck, service.ShowUser)

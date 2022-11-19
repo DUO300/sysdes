@@ -8,5 +8,7 @@
     <label>パスワード: </label><input type="password" name="password" value="{{ .Password }}" required><br>
     <label>もう一度同じパスワードを入力: </label><input type="password" name="password2" value="{{ .Password2 }}" required><br>
     <input type="submit" value="登録">
+    <a href="/"><button type="button">戻る</button></a>
 </form>
+<p><a href="/login">ログイン</a></p>
 {{ template "footer" }}

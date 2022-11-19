@@ -1,18 +1,18 @@
 {{ template "header" . }}
-<h1>Task: {{ .Title }}</h1>
+<h1>タスク名: {{ .Title }}</h1>
 <dl>
-    <dt>ID</dt>
+    <dt>タスクID</dt>
     <dd>{{ .ID }}</dd>
-    <dt>Deadline</dt>
+    <dt>締め切り</dt>
     <dd>{{if eq .Deadline.Valid false}} - {{else}} {{ .Deadline.Time }} {{end}}</dd>
-    <dt>Created at</dt>
+    <dt>登録日時</dt>
     <dd>{{ .CreatedAt }}</dd>
-    <dt>Status</dt>
+    <dt>状態</dt>
     <dd><input type="checkbox" {{ if .IsDone }}checked {{ end }}disabled/>済</dd>
-    <dt>Description</dt>
+    <dt>説明</dt>
     <dd>{{ .Description }}</dd>
 </dl>
 <a href="/list"><button type="button">リストへ戻る</button></a>
 <a href="/task/edit/{{ .ID }}"><button type="button">編集</button></a>
-<button type="button" onclick="confirm_delete({{ .ID }})">削除</button>
+<button type="button" onclick="confirm_delete_task({{ .ID }})">削除</button>
 {{ template "footer" }}

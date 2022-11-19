@@ -186,7 +186,7 @@ func DeleteUser(ctx *gin.Context) {
 	// Clear session data
 	session := sessions.Default(ctx)
 	session.Clear()
-	session.Options(sessions.Options{MaxAge: -1})
+	session.Options(sessions.Options{Path: "/", MaxAge: -1})
 	session.Save()
 	ctx.Redirect(http.StatusFound, "/")
 }

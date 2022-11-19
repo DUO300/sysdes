@@ -1,22 +1,22 @@
 {{ template "header" . }}
-<h1>Task {{ .Task.ID }}: edit</h1>
+<h1>タスク {{ .Task.ID }}: 編集</h1>
 <form id="update-form" action="/task/edit/{{ .Task.ID }}" method="POST">
-    <label>Title</label>
+    <label>タスク名</label>
     <br>
     <input type="text" name="title" value="{{ .Task.Title }}" required>
     <br>
     <input type="radio" name="is_done" value="t" {{ if .Task.IsDone }}checked{{ end }}><label>完了</label>
     <input type="radio" name="is_done" value="f" {{ if not .Task.IsDone }}checked{{ end }}><label>未完了</label>
     <br>
-    <label>Deadline</label>
+    <label>締め切り</label>
     <br>
     <input type="datetime-local" name="deadline" {{if eq .Task.Deadline.Valid true}} value="{{ .Deadline }}" {{end}}>
     <br>
-    <label>Description</label>
+    <label>説明</label>
     <br>
     <textarea name="description">{{ .Task.Description }}</textarea>
     <br>
-    <button type="button" onclick="confirm_update({{ .Task.ID }})">登録</button>
+    <button type="button" onclick="confirm_update_task({{ .Task.ID }})">登録</button>
     <a href="/task/{{ .Task.ID }}"><button type="button">戻る</button></a>
 </form>
 {{ template "footer" }}

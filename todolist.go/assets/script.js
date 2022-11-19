@@ -1,5 +1,5 @@
 /* placeholder file for JavaScript */
-const confirm_delete = (id) => {
+const confirm_delete_task = (id) => {
     if (window.confirm(`Task ${id} を削除します．よろしいですか？`)) {
         location.href = `/task/delete/${id}`;
     }
@@ -7,11 +7,11 @@ const confirm_delete = (id) => {
 
 const confirm_delete_user = (name) => {
     if (window.confirm(`アカウント(アカウント名: ${name}) を削除します．よろしいですか？`)) {
-        location.href = `/delete_user`;
+        location.href = `/user/delete`;
     }
 }
 
-const confirm_update = (id) => {
+const confirm_update_task = (id) => {
     if (window.confirm(`Task ${id} を書き換えます．よろしいですか？`)) {
         document.getElementById(`update-form`).submit();
     }

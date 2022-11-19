@@ -1,15 +1,15 @@
 {{ template "header" . }}
 <h1>タスクの新規登録</h1>
 <form action="/task/new" method="POST">
-    <label>Title</label>
+    <label>タスク名</label>
     <br>
     <input type="text" name="title" required>
     <br>
-    <label>Deadline</label>
+    <label>締め切り</label>
     <br>
     <input type="datetime-local" name="deadline">
     <br>
-    <label>Description</label>
+    <label>説明</label>
     <br>
     <textarea name="description"></textarea>
     <br>

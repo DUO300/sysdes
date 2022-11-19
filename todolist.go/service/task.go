@@ -285,7 +285,7 @@ func UpdateTask(ctx *gin.Context) {
 
 	// Update DB
 	if len(deadline) == 0 {
-		_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=? WHERE id=?", title, is_done_bool, description, id)
+		_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=?, deadline=NULL WHERE id=?", title, is_done_bool, description, id)
 
 	} else {
 		_, err = db.Exec("UPDATE tasks SET title=?, is_done=?, description=?, deadline=? WHERE id=?", title, is_done_bool, description, deadline, id)
