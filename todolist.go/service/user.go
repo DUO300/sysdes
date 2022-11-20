@@ -51,7 +51,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 	if re := regexp.MustCompile(`^[0-9]*$`); re.MatchString(password) {
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password must contain at least one alphabet", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password must contain at least one non-numeric character", "Username": username})
 		return
 	}
 
@@ -75,21 +75,12 @@ func RegisterUser(ctx *gin.Context) {
 	}
 
 	// Create new data with given username and password on DB
-	result, err := db.Exec("INSERT INTO users(name, password) VALUES (?, ?)", username, hash(password))
+	_, err = db.Exec("INSERT INTO users(name, password) VALUES (?, ?)", username, hash(password))
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 
-	// Check DB
-	id, _ := result.LastInsertId()
-	var user database.User
-	err = db.Get(&user, "SELECT id, name, password FROM users WHERE id = ? AND valid=1", id)
-	if err != nil {
-		Error(http.StatusInternalServerError, err.Error())(ctx)
-		return
-	}
-	//ctx.JSON(http.StatusOK, user)
 	ctx.Redirect(http.StatusFound, "/list")
 }
 

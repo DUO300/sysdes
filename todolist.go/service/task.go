@@ -38,13 +38,13 @@ func TaskList(ctx *gin.Context) {
 	// Get query parameter
 	kw := ctx.Query("kw")
 	statusstr := ctx.Query("status")
+	sort_id_str := ctx.Query("sort")
 	kw_h := ctx.Query("kw_h")
 	status_h := ctx.Query("status_h")
 	sort_h := ctx.Query("sort_h")
 	pagenum_str := ctx.Query("pagenum")
 	search := ctx.Query("search")
 	movpage := ctx.Query("movpage")
-	sort_id_str := ctx.Query("sort")
 
 	// Get current page number
 	var pagenum int
@@ -96,12 +96,7 @@ func TaskList(ctx *gin.Context) {
 	// Get tasks in DB
 	var tasks []database.Task
 	query := "SELECT id, title, created_at, is_done, deadline FROM tasks INNER JOIN ownership ON task_id = id WHERE user_id = ?"
-	switch {
-	case kw != "":
-		err = db.Select(&tasks, query+" AND title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query[sort_id], userID, "%"+kw+"%", status)
-	default:
-		err = db.Select(&tasks, query+" AND is_done LIKE ? ORDER BY "+sort_query[sort_id], userID, status)
-	}
+	err = db.Select(&tasks, query+" AND title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query[sort_id], userID, "%"+kw+"%", status)
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
