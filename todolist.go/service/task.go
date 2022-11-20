@@ -111,17 +111,17 @@ func TaskList(ctx *gin.Context) {
 
 // ShowTask renders a task with given ID
 func ShowTask(ctx *gin.Context) {
-	// Get DB connection
-	db, err := database.GetConnection()
-	if err != nil {
-		Error(http.StatusInternalServerError, err.Error())(ctx)
-		return
-	}
-
 	// parse ID given as a parameter
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		Error(http.StatusBadRequest, err.Error())(ctx)
+		return
+	}
+
+	// Get DB connection
+	db, err := database.GetConnection()
+	if err != nil {
+		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
 
@@ -264,7 +264,7 @@ func UpdateTask(ctx *gin.Context) {
 		Error(http.StatusBadRequest, "No deadline is given")(ctx)
 		return
 	}
-	// Get task is_done
+	// Get task status
 	is_done, exist := ctx.GetPostForm("is_done")
 	if !exist {
 		Error(http.StatusBadRequest, "No checkmark is given")(ctx)
@@ -294,7 +294,7 @@ func UpdateTask(ctx *gin.Context) {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
-	// Render status
+	// Redirect to /task/:id
 	path := fmt.Sprintf("/task/%d", id)
 	ctx.Redirect(http.StatusFound, path)
 }

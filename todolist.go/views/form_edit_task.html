@@ -16,7 +16,7 @@
     <br>
     <textarea name="description">{{ .Task.Description }}</textarea>
     <br>
-    <button type="button" onclick="confirm_update_task({{ .Task.ID }})">登録</button>
+    <button type="button" onclick="confirm_update_task({{ .Task.ID }})">更新</button>
     <a href="/task/{{ .Task.ID }}"><button type="button">戻る</button></a>
 </form>
 {{ template "footer" }}
