@@ -12,7 +12,7 @@ import (
 )
 
 func NewUserForm(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "new_user_form.html", gin.H{"Title": "Register user"})
+	ctx.HTML(http.StatusOK, "form_new_user.html", gin.H{"Title": "Register user"})
 }
 
 func hash(pw string) []byte {
@@ -32,26 +32,26 @@ func RegisterUser(ctx *gin.Context) {
 	// Check each data
 	switch {
 	case username == "":
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Username is not provided", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Username is not provided", "Username": username})
 		return
 	case password == "":
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password is not provided", "Password": password})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Password is not provided", "Password": password})
 		return
 	case password2 == "":
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password is not provided", "Password2": password2})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Password is not provided", "Password2": password2})
 		return
 	case password != password2:
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Passwords do not match", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Passwords do not match", "Username": username})
 		return
 	}
 
 	// Check password
 	if len(password) <= 4 {
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password too short. Password length must be at least 5", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Password too short. Password length must be at least 5", "Username": username})
 		return
 	}
 	if re := regexp.MustCompile(`^[0-9]*$`); re.MatchString(password) {
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Password must contain at least one non-numeric character", "Username": username})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Password must contain at least one non-numeric character", "Username": username})
 		return
 	}
 
@@ -70,7 +70,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 	if duplicate > 0 {
-		ctx.HTML(http.StatusBadRequest, "new_user_form.html", gin.H{"Title": "Register user", "Error": "Username is already taken", "Username": username, "Password": password, "Password2": password2})
+		ctx.HTML(http.StatusBadRequest, "form_new_user.html", gin.H{"Title": "Register user", "Error": "Username is already taken", "Username": username, "Password": password, "Password2": password2})
 		return
 	}
 
