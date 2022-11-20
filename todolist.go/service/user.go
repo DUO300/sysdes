@@ -144,8 +144,9 @@ func LoginCheck(ctx *gin.Context) {
 		if err != nil {
 			ctx.Redirect(http.StatusFound, "/login")
 			ctx.Abort()
+		} else {
+			ctx.Next()
 		}
-		ctx.Next()
 	}
 }
 
@@ -194,7 +195,7 @@ func ShowUser(ctx *gin.Context) {
 
 	// Get target user
 	var user database.User
-	err = db.Get(&user, "SELECT * FROM users WHERE id=? AND valid=1", userID) // Use DB#Get for one entry
+	err = db.Get(&user, "SELECT * FROM users WHERE id=? AND valid=1", userID)
 	if err != nil {
 		Error(http.StatusBadRequest, err.Error())(ctx)
 		return
