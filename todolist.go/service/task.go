@@ -23,6 +23,9 @@ func TaskList(ctx *gin.Context) {
 	// Define pagesize
 	const PAGESIZE = 5
 
+	// Define array for mapping sort id to sort query
+	sort_query := [...]string{"id ASC", "id DESC", "title ASC", "title DESC", "deadline IS NULL ASC, deadline", "deadline DESC", "created_at ASC", "created_at DESC"}
+
 	userID := sessions.Default(ctx).Get("user")
 
 	// Get DB connection
@@ -41,7 +44,7 @@ func TaskList(ctx *gin.Context) {
 	pagenum_str := ctx.Query("pagenum")
 	search := ctx.Query("search")
 	movpage := ctx.Query("movpage")
-	sort_query := ctx.Query("sort")
+	sort_id_str := ctx.Query("sort")
 
 	// Get current page number
 	var pagenum int
@@ -60,7 +63,7 @@ func TaskList(ctx *gin.Context) {
 	if search == "" {
 		kw = kw_h
 		statusstr = status_h
-		sort_query = sort_h
+		sort_id_str = sort_h
 	} else {
 		pagenum = 1
 	}
@@ -81,8 +84,13 @@ func TaskList(ctx *gin.Context) {
 		status = "%"
 	}
 
-	if sort_query == "" {
-		sort_query = "id ASC"
+	if sort_id_str == "" {
+		sort_id_str = "0"
+	}
+	sort_id, err := strconv.Atoi(sort_id_str)
+	if err != nil {
+		Error(http.StatusBadRequest, err.Error())(ctx)
+		return
 	}
 
 	// Get tasks in DB
@@ -90,9 +98,9 @@ func TaskList(ctx *gin.Context) {
 	query := "SELECT id, title, created_at, is_done, deadline FROM tasks INNER JOIN ownership ON task_id = id WHERE user_id = ?"
 	switch {
 	case kw != "":
-		err = db.Select(&tasks, query+" AND title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query, userID, "%"+kw+"%", status)
+		err = db.Select(&tasks, query+" AND title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query[sort_id], userID, "%"+kw+"%", status)
 	default:
-		err = db.Select(&tasks, query+" AND is_done LIKE ? ORDER BY "+sort_query, userID, status)
+		err = db.Select(&tasks, query+" AND is_done LIKE ? ORDER BY "+sort_query[sort_id], userID, status)
 	}
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
@@ -106,7 +114,7 @@ func TaskList(ctx *gin.Context) {
 	}
 
 	// Render tasks
-	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum-1)*PAGESIZE : min(pagenum*PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage, "Sort": sort_query})
+	ctx.HTML(http.StatusOK, "task_list.html", gin.H{"Title": "Task list", "Tasks": tasks[(pagenum-1)*PAGESIZE : min(pagenum*PAGESIZE, len(tasks))], "Kw": kw, "Status": statusstr, "Pagenum": pagenum, "Is_lastpage": is_lastpage, "Sort": sort_id})
 }
 
 // ShowTask renders a task with given ID

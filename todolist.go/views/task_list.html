@@ -15,14 +15,14 @@
     <input type="radio" name="status" value="incomplete" {{ if eq .Status "incomplete" }}checked{{ end
         }}><label>未完了のみ表示</label>
     <select name="sort">
-        <option value="id ASC" {{if eq .Sort "id ASC" }} selected {{end}}>ID(昇順)</option>
-        <option value="id DESC" {{if eq .Sort "id DESC" }} selected {{end}}>ID(降順)</option>
-        <option value="title ASC" {{if eq .Sort "title ASC" }} selected {{end}}>タイトル(昇順)</option>
-        <option value="title DESC" {{if eq .Sort "title DESC" }} selected {{end}}>タイトル(降順)</option>
-        <option value="deadline IS NULL ASC, deadline" {{if eq .Sort "deadline IS NULL ASC, deadline" }} selected {{end}}>締め切り(昇順)</option>
-        <option value="deadline DESC" {{if eq .Sort "deadline DESC" }} selected {{end}}>締め切り(降順)</option>
-        <option value="created_at ASC" {{if eq .Sort "created_at ASC" }} selected {{end}}>登録日(昇順)</option>
-        <option value="created_at DESC" {{if eq .Sort "created_at DESC" }} selected {{end}}>登録日(降順)</option>
+        <option value=0 {{if eq .Sort 0 }} selected {{end}}>ID(昇順)</option>
+        <option value=1 {{if eq .Sort 1 }} selected {{end}}>ID(降順)</option>
+        <option value=2 {{if eq .Sort 2 }} selected {{end}}>タイトル(昇順)</option>
+        <option value=3 {{if eq .Sort 3 }} selected {{end}}>タイトル(降順)</option>
+        <option value=4 {{if eq .Sort 4 }} selected {{end}}>締め切り(昇順)</option>
+        <option value=5 {{if eq .Sort 5 }} selected {{end}}>締め切り(降順)</option>
+        <option value=6 {{if eq .Sort 6 }} selected {{end}}>登録日(昇順)</option>
+        <option value=7 {{if eq .Sort 7 }} selected {{end}}>登録日(降順)</option>
     </select>
     <input type="submit" name="search" value="検索">
     <p><a href="/task/new">新規登録</a></p>
@@ -38,10 +38,13 @@
             <th>登録日時</th>
         </tr>
         {{ range $task := .Tasks }}
-        <tr align="center" id={{$task.ID}}>
+        <tr align="center" id={{ $task.ID }}>
             <td><a href="/task/{{ $task.ID }}">{{ $task.ID }}</a></td>
             <td>{{ $task.Title }}</td>
-            <td>{{if eq $task.Deadline.Valid false}} <font> - </font> {{else}} <script> past_deadline_bgcolor("{{ $task.Deadline.Time }}", "{{ $task.ID }}", "{{ $task.IsDone }}") </script> {{ $task.Deadline.Time }} </font> {{end}}</td>
+            <td>{{if eq $task.Deadline.Valid false}} <font> - </font> {{else}}
+                <script> past_deadline_bgcolor("{{ $task.Deadline.Time }}", "{{ $task.ID }}", "{{ $task.IsDone }}") </script>
+                {{ $task.Deadline.Time }} </font> {{end}}
+            </td>
             <td>{{ if $task.IsDone }}済{{ end }}</td>
             <td>{{ $task.CreatedAt }}</td>
         </tr>

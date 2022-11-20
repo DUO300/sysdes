@@ -1,7 +1,9 @@
 {{ template "header" . }}
 <h1>ログイン</h1>
 {{ if .Error }}
-<p><font color="#FF0000">{{ .Error }}</font></p>
+<p>
+    <font color="#FF0000">{{ .Error }}</font>
+</p>
 {{ end }}
 <form action="/login" method="POST">
     <label>ユーザ名: </label><input type="text" name="username" value="{{ .Username }}" required><br>

@@ -1,8 +1,10 @@
 {{ template "header" . }}
 <h1>アカウント情報: 編集</h1>
 {{ if .Error }}
-<p><font color="#FF0000">{{ .Error }}</font><p>
-{{ end }}
+<p>
+    <font color="#FF0000">{{ .Error }}</font>
+<p>
+    {{ end }}
 <form id="update-form" action="/user/edit" method="POST">
     <label>アカウント名</label>
     <br>
