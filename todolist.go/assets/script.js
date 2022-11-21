@@ -6,7 +6,7 @@ const confirm_delete_task = (id) => {
 }
 
 const confirm_delete_user = (name) => {
-    if (window.confirm(`アカウント(アカウント名: ${name}) を削除します．よろしいですか？`)) {
+    if (window.confirm(`アカウント(ユーザ名: ${name}) を削除します．よろしいですか？`)) {
         location.href = `/user/delete`;
     }
 }
@@ -18,7 +18,7 @@ const confirm_update_task = (id) => {
 }
 
 const confirm_update_user = () => {
-    if (window.confirm(`アカウント情報を更新します．よろしいですか？`)) {
+    if (window.confirm(`ユーザ情報を更新します．よろしいですか？`)) {
         document.getElementById(`update-form`).submit();
     }
 }

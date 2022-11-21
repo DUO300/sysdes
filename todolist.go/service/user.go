@@ -205,7 +205,7 @@ func ShowUser(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "user.html", gin.H{"Title": "User", "User": user})
 }
 
-func EditUser(ctx *gin.Context) {
+func EditUserForm(ctx *gin.Context) {
 
 	userID := sessions.Default(ctx).Get("user")
 
@@ -307,6 +307,7 @@ func UpdateUser(ctx *gin.Context) {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
 		return
 	}
-	// Render status
+
+	// Render user information
 	ctx.Redirect(http.StatusFound, "/user/info")
 }

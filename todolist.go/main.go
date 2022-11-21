@@ -78,7 +78,7 @@ func main() {
 	engine.GET("/user/info", service.LoginCheck, service.ShowUser)
 
 	// Edit user account
-	engine.GET("/user/edit", service.LoginCheck, service.EditUser)
+	engine.GET("/user/edit", service.LoginCheck, service.EditUserForm)
 	engine.POST("/user/edit", service.LoginCheck, service.UpdateUser)
 
 	// Start server

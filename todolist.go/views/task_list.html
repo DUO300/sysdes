@@ -1,6 +1,6 @@
 {{ template "header" . }}
 <h1>登録済みタスク一覧</h1>
-<li><a href="/user/info">アカウント情報</a></li>
+<li><a href="/user/info">ユーザ情報</a></li>
 <li><a href="/logout">ログアウト</a></li>
 <form action="/list" method="GET">
     <input type="hidden" name="kw_h" value="{{ .Kw }}">
