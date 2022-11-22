@@ -1,4 +1,3 @@
-/* placeholder file for JavaScript */
 const confirm_delete_task = (id) => {
     if (window.confirm(`Task ${id} を削除します．よろしいですか？`)) {
         location.href = `/task/delete/${id}`;

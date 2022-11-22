@@ -234,7 +234,7 @@ func EditTaskForm(ctx *gin.Context) {
 	// Change the format of datetime so html can read the value correctly
 	var date_str_formated string
 	if task.Deadline.Valid {
-		date_str_formated = task.Deadline.Time.Format("2006-01-02T15:04:05")
+		date_str_formated = task.Deadline.Time.Format("2006-01-02T15:04")
 	}
 
 	// Render edit form
