@@ -24,7 +24,7 @@ func TaskList(ctx *gin.Context) {
 	const PAGESIZE = 5
 
 	// Define array for mapping sort id to sort query
-	sort_query := [...]string{"id ASC", "id DESC", "title ASC", "title DESC", "deadline IS NULL ASC, deadline", "deadline DESC", "created_at ASC", "created_at DESC"}
+	sort_query := [...]string{"id ASC", "id DESC", "title ASC", "title DESC", "deadline IS NULL ASC, deadline ASC", "deadline DESC", "created_at ASC", "created_at DESC"}
 
 	userID := sessions.Default(ctx).Get("user")
 

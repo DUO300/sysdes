@@ -36,9 +36,11 @@ const past_deadline_bgcolor = (date_str_all, id, status) => {
     const now = new Date(Date.now());
     if (date.getTime() < now.getTime()) {
         if (status == "false") {
+            // Set background color to red
             document.getElementById(id).style.backgroundColor = "#ffcccc";
         }
         else {
+            // Set background color to green
             document.getElementById(id).style.backgroundColor = "#99ffcc";
         }
     }
