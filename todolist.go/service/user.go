@@ -104,7 +104,7 @@ func Login(ctx *gin.Context) {
 
 	// Get user from DB (valid only)
 	var user database.User
-	err = db.Get(&user, "SELECT id, name, password FROM users WHERE name = ? AND valid=1", username)
+	err = db.Get(&user, "SELECT id, name, password FROM users WHERE name=? AND valid=1", username)
 	if err != nil {
 		ctx.HTML(http.StatusBadRequest, "login.html", gin.H{"Title": "Login", "Username": username, "Error": "No such user"})
 		return

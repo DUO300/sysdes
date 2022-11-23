@@ -95,7 +95,7 @@ func TaskList(ctx *gin.Context) {
 
 	// Get tasks in DB
 	var tasks []database.Task
-	query := "SELECT id, title, created_at, is_done, deadline FROM tasks INNER JOIN ownership ON task_id = id WHERE user_id = ?"
+	query := "SELECT id, title, created_at, is_done, deadline FROM tasks INNER JOIN ownership ON task_id=id WHERE user_id=?"
 	err = db.Select(&tasks, query+" AND title LIKE ? AND is_done LIKE ? ORDER BY "+sort_query[sort_id], userID, "%"+kw+"%", status)
 	if err != nil {
 		Error(http.StatusInternalServerError, err.Error())(ctx)
