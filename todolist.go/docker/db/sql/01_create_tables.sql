@@ -11,7 +11,7 @@ CREATE TABLE `tasks` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
 
-
+-- Table for users
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -24,6 +24,7 @@ CREATE TABLE `users` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8mb4;
 
+-- Table for linking tasks and users
 DROP TABLE IF EXISTS `ownership`;
 
 CREATE TABLE `ownership` (

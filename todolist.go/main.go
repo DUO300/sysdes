@@ -46,7 +46,7 @@ func main() {
 	taskGroup.Use(service.LoginCheck)
 	{
 		// Show task info
-		taskGroup.GET("/:id", service.TaskCheck, service.ShowTask) // ":id" is a parameter
+		taskGroup.GET("/:id", service.TaskCheck, service.ShowTask)
 
 		// Register new task
 		taskGroup.GET("/new", service.NewTaskForm)
